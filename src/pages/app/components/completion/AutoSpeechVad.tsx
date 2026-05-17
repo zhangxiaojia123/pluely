@@ -5,7 +5,7 @@ import { LoaderCircleIcon, MicIcon, MicOffIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components";
 import { useApp } from "@/contexts";
-import { floatArrayToWav } from "@/lib/utils";
+import { floatArrayToWav, isFillerText } from "@/lib/utils";
 import { shouldUsePluelyAPI } from "@/lib/functions/pluely.api";
 
 interface AutoSpeechVADProps {
@@ -32,6 +32,13 @@ const AutoSpeechVADInternal = ({
   const vad = useMicVAD({
     userSpeakingThreshold: 0.6,
     startOnLoad: true,
+    // --- Custom: filter out short utterances like "嗯", "好", "对" ---
+    // Each frame = 1536 samples / 16kHz ≈ 96ms
+    minSpeechFrames: 20,            // ~1.9s minimum speech to trigger (default 3 ≈ 288ms)
+    redemptionFrames: 25,           // ~2.4s grace period before finalizing (default 8 ≈ 768ms)
+    positiveSpeechThreshold: 0.5,   // higher threshold to start detecting (default 0.5)
+    negativeSpeechThreshold: 0.35,  // slightly raised to end detecting (default 0.35)
+    // ----------------------------------------------------------------
     additionalAudioConstraints: audioConstraints,
     onSpeechEnd: async (audio) => {
       try {
@@ -75,7 +82,7 @@ const AutoSpeechVADInternal = ({
           audio: audioBlob,
         });
 
-        if (transcription) {
+        if (transcription && !isFillerText(transcription)) {
           submit(transcription);
         }
       } catch (error) {

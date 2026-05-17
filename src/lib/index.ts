@@ -1,4 +1,5 @@
 export * from "./storage";
+export { isFillerText } from "./utils";
 export * from "./version";
 export * from "./functions";
 export * from "./curl-validator";

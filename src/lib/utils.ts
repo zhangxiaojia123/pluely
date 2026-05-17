@@ -5,6 +5,30 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const FILLER_WORDS = new Set([
+  // 中文单字
+  '嗯', '啊', '哦', '哈', '呃', '额', '好', '对', '行', '是', '噢', '哎', '诶',
+  // 中文短语
+  '嗯嗯', '哦哦', '啊啊', '好的', '好吧', '对对', '对的', '是的', '行吧', '嗯啊',
+  '对对对', '好好', '嗯哦', '哦对', '就是', '然后', '那个',
+  // 英文
+  'ok', 'okay', 'uh', 'um', 'hmm', 'mm', 'mmm', 'ah', 'er', 'eh',
+  'right', 'sure', 'yep', 'yup', 'yeah', 'hm', 'uh huh', 'mm hmm',
+]);
+
+export function isFillerText(text: string): boolean {
+  const normalized = text.trim().toLowerCase();
+  if (!normalized) return true;
+  if (FILLER_WORDS.has(normalized)) return true;
+  // 纯标点符号
+  if (/^[\s\p{P}]+$/u.test(normalized)) return true;
+  // 中文字符数 ≤ 2（单字或双字，且不含英文/数字）
+  const chineseChars = normalized.match(/\p{Script=Han}/gu) ?? [];
+  const hasOnlyChinese = /^[\p{Script=Han}\s]+$/u.test(normalized);
+  if (hasOnlyChinese && chineseChars.length <= 2) return true;
+  return false;
+}
+
 export const floatArrayToWav = (
   audioData: Float32Array,
   sampleRate: number = 16000,

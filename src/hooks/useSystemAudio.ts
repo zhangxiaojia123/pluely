@@ -17,6 +17,7 @@ import {
   CONVERSATION_SAVE_DEBOUNCE_MS,
   generateConversationId,
   generateMessageId,
+  isFillerText,
 } from "@/lib";
 import { Message } from "@/types/completion";
 
@@ -272,7 +273,7 @@ export function useSystemAudio() {
                 timeoutPromise,
               ]);
 
-              if (transcription.trim()) {
+              if (transcription.trim() && !isFillerText(transcription)) {
                 setLastTranscription(transcription);
                 setError("");
 
