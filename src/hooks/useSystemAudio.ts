@@ -41,7 +41,7 @@ const DEFAULT_VAD_CONFIG: VadConfig = {
   sensitivity_rms: 0.012, // Much less sensitive - only real speech
   peak_threshold: 0.035, // Higher threshold - filters clicks/noise
   silence_chunks: 45, // ~1.0s of required silence
-  min_speech_chunks: 7, // ~0.16s - captures short answers
+  min_speech_chunks: 40, // ~0.9s - filters short filler words like "嗯"/"ok"
   pre_speech_chunks: 12, // ~0.27s - enough to catch word start
   noise_gate_threshold: 0.003, // Stronger noise filtering
   max_recording_duration_secs: 180, // 3 minutes default
